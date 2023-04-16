@@ -14,12 +14,13 @@ def get_data(top_pos):
 
     features = ['horse_age', 'horse_rating', 'declared_weight', 'actual_weight', 'draw', 'horse_country', 'horse_type']
     X = data[features]
-    y = data['top_pos']
+    # y = data['top_pos']
+    y = data
 
     X = pd.get_dummies(X, columns=['horse_country', 'horse_type'])
 
 
-    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=27, stratify=y)
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=27, stratify=y['top_pos'])
     return X_train, X_test, y_train, y_test
 
 def nbayes_fit(X, y):
@@ -36,7 +37,7 @@ def nbayes_fit(X, y):
     for i, y_label in enumerate(y_labels):
         # For every feature column
         for j, col in enumerate(X.T):
-            if j < 5:
+            if j < 4:
                 mu = np.sum(col[y == y_label]) / y_counts[i]
                 sigma = np.sqrt(np.sum((col[y == y_label] - mu)**2) / y_counts[i])
                 thetas = np.array([mu, sigma])
@@ -63,7 +64,7 @@ def nbayes_predict(X, X_params, y_params):
         for j in range(len(hypotheses)):
             # For each feature in x, consider the likelihood that the hypothesis holds for that feature
             for k, feature in enumerate(x):
-                if k < 5:
+                if k < 4:
                     hypotheses[j] += norm.pdf(x[k],loc=X_params[j][k]["mu"],scale=X_params[j][k]["sigma"])
                 else:
                     try:
@@ -79,5 +80,7 @@ def gamble(X, y_pred, y_true, bet):
     bets = np.count_nonzero(y_pred)
     money = -10*bets
     if bet == 'win':
-        money += 10 * X['win_odds'].values[(y_pred == 1) & (y_true == 1)]
+        money += np.sum(10 * y_true['win_odds'].values[(y_pred == 1) & (y_true['top_pos'] == 1)])
+    elif bet == 'place':
+        money += np.sum(10*y_true['place_odds'].values[(y_pred == 1) & (y_true['top_pos'] == 1)])
     return money
