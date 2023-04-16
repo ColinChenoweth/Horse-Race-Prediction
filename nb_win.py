@@ -1,5 +1,3 @@
-import numpy as np
-import pandas as pd
 import util
 from sklearn.metrics import accuracy_score, classification_report
 
@@ -14,7 +12,7 @@ def main():
 
     print("Net return: ", money)
     print("Accuracy: ", accuracy_score(y_test['top_pos'], y_pred))
-    print(classification_report(y_test['top_pos'], y_pred))
+    # print(classification_report(y_test['top_pos'], y_pred))
 
 
 if __name__ == "__main__":

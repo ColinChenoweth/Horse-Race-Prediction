@@ -44,6 +44,9 @@ def nbayes_fit(X, y):
                 x_labels = np.array(["mu", "sigma"])
             else:
                 x_labels, x_counts = np.unique(col[y == y_label], return_counts=True)
+                # p = 1/len(np.unique(col))
+                # m = 1/p
+                # thetas = (x_counts+m*p)/(y_counts[i]+m)
 
                 # MLE probability parameters with smoothing
                 thetas = x_counts/y_counts[i]
@@ -70,7 +73,8 @@ def nbayes_predict(X, X_params, y_params):
                     try:
                         hypotheses[j] += X_params[j][k][feature]
                     except:
-                        print("feature not in training", k)
+                        hypotheses[j] += 0
+                        # print("feature not in training", k)
         # Pick the most probable hypothesis
         y_hat[i] = np.argmax(hypotheses)
 
