@@ -2,6 +2,8 @@ import numpy as np
 import pandas as pd
 from sklearn.model_selection import train_test_split
 from scipy.stats import norm
+from imblearn.under_sampling import RandomUnderSampler
+
 
 def get_data(top_pos):
 
@@ -12,7 +14,7 @@ def get_data(top_pos):
 
     data['top_pos'] = data['result'].apply(lambda x: 1 if x <= top_pos else 0)
 
-    features = ['horse_age', 'horse_rating', 'declared_weight', 'actual_weight', 'draw', 'horse_country', 'horse_type']
+    features = ['horse_age', 'horse_rating', 'declared_weight', 'actual_weight', 'win_odds', 'place_odds', 'draw', 'horse_country', 'horse_type']
     X = data[features]
     # y = data['top_pos']
     y = data
@@ -21,7 +23,19 @@ def get_data(top_pos):
 
 
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=27, stratify=y['top_pos'])
-    return X_train, X_test, y_train, y_test
+
+    X_train = X_train.fillna(0)
+    X_test = X_test.fillna(0)
+    y_train = y_train.fillna(0)
+    y_test = y_test.fillna(0)
+
+    a = np.unique(y_train['top_pos'], return_counts=True)
+    cur_ss = a[1][1]/(a[1][0])
+
+    undersampler = RandomUnderSampler(sampling_strategy=cur_ss**(1/2))
+    X_train_resampled, y_train_resampled = undersampler.fit_resample(X_train, y_train['top_pos'])
+
+    return X_train_resampled, X_test, y_train_resampled, y_test
 
 def nbayes_fit(X, y):
     n_examples, n_features = X.shape
@@ -37,7 +51,7 @@ def nbayes_fit(X, y):
     for i, y_label in enumerate(y_labels):
         # For every feature column
         for j, col in enumerate(X.T):
-            if j < 4:
+            if j < 6:
                 mu = np.sum(col[y == y_label]) / y_counts[i]
                 sigma = np.sqrt(np.sum((col[y == y_label] - mu)**2) / y_counts[i])
                 thetas = np.array([mu, sigma])
@@ -67,7 +81,7 @@ def nbayes_predict(X, X_params, y_params):
         for j in range(len(hypotheses)):
             # For each feature in x, consider the likelihood that the hypothesis holds for that feature
             for k, feature in enumerate(x):
-                if k < 4:
+                if k < 6:
                     hypotheses[j] += norm.pdf(x[k],loc=X_params[j][k]["mu"],scale=X_params[j][k]["sigma"])
                 else:
                     try:
@@ -82,6 +96,7 @@ def nbayes_predict(X, X_params, y_params):
 
 def gamble(X, y_pred, y_true, bet):
     bets = np.count_nonzero(y_pred)
+    print("Num Bets: ", bets)
     money = -10*bets
     if bet == 'win':
         money += np.sum(10 * y_true['win_odds'].values[(y_pred == 1) & (y_true['top_pos'] == 1)])

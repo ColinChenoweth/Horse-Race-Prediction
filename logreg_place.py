@@ -15,7 +15,7 @@ def main():
     X_test = scaler.transform(X_test)
 
     clf = logreg.LogisticRegression(learning_rate=0.1, max_iter=1000)
-    clf.fit(X_train, y_train['top_pos'])
+    clf.fit(X_train, y_train)
 
     y_pred = clf.predict(X_test)
 
