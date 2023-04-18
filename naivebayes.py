@@ -5,7 +5,7 @@ class NaiveBayes:
     def __init__(self, num_cont_feat):
         self.num_cont_feat = num_cont_feat
     
-    def nbayes_fit(self, X, y):
+    def fit(self, X, y):
         n_examples, n_features = X.shape
 
         y_labels, y_counts = np.unique(y, return_counts=True)
@@ -43,7 +43,7 @@ class NaiveBayes:
 
         return X_params, y_params
 
-    def nbayes_predict(self, X, X_params, y_params):
+    def predict(self, X, X_params, y_params):
         y_hat = np.empty(len(X))
         # For each example x, find the most probable hypothesis
         for i, x in enumerate(X):

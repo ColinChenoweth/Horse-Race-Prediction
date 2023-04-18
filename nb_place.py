@@ -7,13 +7,12 @@ def main():
 
     clf = naivebayes.NaiveBayes(6)
 
-    X_params, y_params = clf.nbayes_fit(X_train.values, y_train.values)
+    X_params, y_params = clf.fit(X_train.values, y_train.values)
 
-    y_pred = clf.nbayes_predict(X_test.values, X_params, y_params)
+    y_pred = clf.predict(X_test.values, X_params, y_params)
 
-    money = util.gamble(X_test, y_pred, y_test, "place")
+    util.gamble(y_pred, y_test, "place")
 
-    print("Net return: ", money)
     print("Accuracy: ", accuracy_score(y_test['top_pos'], y_pred))
     # print(classification_report(y_test['top_pos'], y_pred))
 

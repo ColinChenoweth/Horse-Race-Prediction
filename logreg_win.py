@@ -19,9 +19,8 @@ def main():
 
     y_pred = clf.predict(X_test)
 
-    money = util.gamble(X_test, y_pred, y_test, "win")
+    util.gamble(y_pred, y_test, "win")
 
-    print("Net return: ", money)
     print("Accuracy:", accuracy_score(y_test['top_pos'], y_pred))
 
 if __name__ == "__main__":

@@ -15,11 +15,12 @@ def get_data(top_pos):
 
     # make sure all continuous features come first, then draw and all other nominal features
     # also make sure to set/change num_cont_features correctly when creating NaiveBayes
-    features = ['horse_age', 'horse_rating', 'declared_weight', 'actual_weight', 'win_odds', 'place_odds', 'draw', 'horse_country', 'horse_type']
+    # features = ['horse_age', 'actual_weight', 'win_odds', 'surface', 'race_class', 'horse_type']
+    features = ['horse_age', 'declared_weight', 'actual_weight', 'horse_rating', 'win_odds', 'place_odds', 'draw', 'surface', 'distance', 'race_class', 'going', 'horse_country', 'horse_type']
     X = data[features]
     y = data
 
-    X = pd.get_dummies(X, columns=['horse_country', 'horse_type'])
+    X = pd.get_dummies(X, columns=['going', 'horse_country', 'horse_type'])
 
 
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=27, stratify=y['top_pos'])
@@ -42,7 +43,7 @@ def get_data(top_pos):
     # y_test has all features in the dataset
     return X_train_resampled, X_test, y_train_resampled, y_test
 
-def gamble(X, y_pred, y_true, bet):
+def gamble(y_pred, y_true, bet):
     bets = np.count_nonzero(y_pred)
     print("Num Bets: ", bets)
     money = -10*bets
@@ -50,4 +51,5 @@ def gamble(X, y_pred, y_true, bet):
         money += np.sum(10 * y_true['win_odds'].values[(y_pred == 1) & (y_true['top_pos'] == 1)])
     elif bet == 'place':
         money += np.sum(10*y_true['place_odds'].values[(y_pred == 1) & (y_true['top_pos'] == 1)])
-    return money
+    print("Net return", money)
+    return
